@@ -1,0 +1,9 @@
+﻿IF DB_ID('Global') IS NULL CREATE DATABASE Global;
+IF DB_ID('Europe') IS NULL CREATE DATABASE Europe;
+IF DB_ID('Asia') IS NULL CREATE DATABASE Asia;
+IF DB_ID('SouthAmerica') IS NULL CREATE DATABASE SouthAmerica;
+IF DB_ID('NorthAmerica') IS NULL CREATE DATABASE NorthAmerica;
+IF DB_ID('Antarctica') IS NULL CREATE DATABASE Antarctica;
+IF DB_ID('Africa') IS NULL CREATE DATABASE Africa;
+IF DB_ID('Australia') IS NULL CREATE DATABASE Australia;
+

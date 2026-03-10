@@ -1,4 +1,6 @@
 ﻿using Article.Data.configuration;
+using Article.Data.repositories;
+using Article.Services.application_interfaces.ports;
 using Microsoft.Extensions.DependencyInjection;
 using models.continents;
 
@@ -42,6 +44,9 @@ namespace Article.Data
             services.AddSingleton<AntarcticaArticleDbContext>(sp =>
                 (AntarcticaArticleDbContext)sp.GetRequiredService<ArticleDbContextFactory>()
                     .CreateDbContextForContinent(Continent.Antarctica));
+
+
+            services.AddScoped<IArticleRepository, ArticleRepository>();
 
             return services;
         }
