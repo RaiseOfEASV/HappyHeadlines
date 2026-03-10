@@ -1,0 +1,24 @@
+
+using Article.Data;
+using Article.Services;
+using Options;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
+builder.Services.AddAppOptions(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddDataSourceAndRepositories();
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.MapControllers();
+app.UseHttpsRedirection();
+app.UseAuthorization();
+
+app.Run();
