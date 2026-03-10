@@ -22,7 +22,7 @@ Direct pushes to `master` are blocked for everyone, including admins (`bypass_ac
 
 Requires the [GitHub CLI](https://cli.github.com/) (`gh`) and **Admin** (personal repo) or **Owner** (org repo) permissions.
 
-**Org repo:**
+**Create (first time):**
 ```bash
 gh api \
   --method POST \
@@ -31,6 +31,29 @@ gh api \
   /repos/RaiseOfEASV/HappyHeadlines/rulesets \
   --input .github/rulesets/protect-master.json
 ```
+
+**Update (ruleset already exists):**
+
+First find the ruleset ID:
+```bash
+gh api \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  /repos/RaiseOfEASV/HappyHeadlines/rulesets
+```
+
+Then apply the update using the `id` from the response:
+```bash
+gh api \
+  --method PUT \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  /repos/RaiseOfEASV/HappyHeadlines/rulesets/<ID> \
+  --input .github/rulesets/protect-master.json
+```
+
+The current ruleset ID is `13727464`.
+
 ### Verifying the ruleset is active
 
 ```bash
