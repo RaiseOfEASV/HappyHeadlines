@@ -1,6 +1,6 @@
 ﻿namespace Options;
 
-public class Class1
+public class AppOptions
 {
-
+    public string DbConnectionString { get; set; } = string.Empty;
 }

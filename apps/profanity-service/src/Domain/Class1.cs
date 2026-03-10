@@ -1,6 +1,7 @@
 ﻿namespace Domain;
 
-public class Class1
+public class ProfanityWord
 {
-
+    public Guid Id { get; set; }
+    public string Word { get; set; } = string.Empty;
 }

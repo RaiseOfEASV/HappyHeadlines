@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Profanity.Services\Profanity.Services.csproj" />
+    <ProjectReference Include="..\Profanity.Data\Profanity.Data.csproj" />
     <ProjectReference Include="..\Options\Options.csproj" />
   </ItemGroup>
 </Project>

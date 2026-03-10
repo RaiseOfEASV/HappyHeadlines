@@ -1,6 +1,8 @@
 ﻿namespace Profanity.Services;
 
-public class Class1
+public interface IProfanityService
 {
-
+    Task<string> FilterAsync(string text);
+    Task<IEnumerable<string>> GetWordsAsync();
+    Task AddWordAsync(string word);
 }
