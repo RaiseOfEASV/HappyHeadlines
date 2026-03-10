@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Profanity.Services\Profanity.Services.csproj" />
+    <ProjectReference Include="..\Options\Options.csproj" />
+  </ItemGroup>
+</Project>
