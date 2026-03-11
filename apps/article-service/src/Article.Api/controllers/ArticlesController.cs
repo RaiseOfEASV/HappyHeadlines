@@ -1,6 +1,7 @@
 ﻿using Article.Services.application_interfaces.ports;
 using Microsoft.AspNetCore.Mvc;
 using models.articles;
+using models.continents;
 
 namespace Article.Api.controllers;
 
@@ -8,10 +9,10 @@ namespace Article.Api.controllers;
 [Route("api/[controller]")]
 public class ArticlesController(IArticleService articleService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [HttpGet("{continent}")]
+    public async Task<IActionResult> GetAll(Continent continent)
     {
-        var articles = await articleService.GetAllArticlesAsync();
+        var articles = await articleService.GetAllArticlesAsync(continent);
         return Ok(articles);
     }
 

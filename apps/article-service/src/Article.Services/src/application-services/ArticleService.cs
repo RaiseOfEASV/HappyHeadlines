@@ -1,13 +1,15 @@
 ﻿using Article.Services.application_interfaces.ports;
 using Domain.valueobjects;
 using models.articles;
+using models.continents;
 
 namespace Article.Services.application_services;
 
-public class ArticleService(IArticleRepository articleRepository) : IArticleService
+public class ArticleService(IArticleRepository articleRepository,IContinentContext continentContext) : IArticleService
 {
-    public async Task<IEnumerable<ArticleDto>> GetAllArticlesAsync()
+    public async Task<IEnumerable<ArticleDto>> GetAllArticlesAsync(Continent continent)
     {
+        continentContext.Continent = continent;
         var articles = await articleRepository.GetAllAsync();
         return articles.Select(ToDto);
     }
