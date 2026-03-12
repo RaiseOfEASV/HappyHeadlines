@@ -19,6 +19,7 @@ public class ProfanityDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Word).HasColumnName("word").IsRequired();
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired();
             entity.HasIndex(e => e.Word).IsUnique();
         });
     }

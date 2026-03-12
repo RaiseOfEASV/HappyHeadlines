@@ -1,0 +1,3 @@
+ALTER TABLE profanity_words
+    ADD COLUMN created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW();
+

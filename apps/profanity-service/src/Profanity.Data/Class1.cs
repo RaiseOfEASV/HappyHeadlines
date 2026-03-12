@@ -9,4 +9,6 @@ public class ProfanityWordEntity
 
     [Required]
     public string Word { get; set; } = string.Empty;
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
