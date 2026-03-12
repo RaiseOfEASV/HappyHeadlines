@@ -1,0 +1,58 @@
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  profanity-db:
+    image: postgres:17-alpine
+    container_name: profanity-db
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432"          # host 5433 → container 5432 (avoids conflict with other DBs on 5432)
+    volumes:
+      - profanity-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 10
+      start_period: 20s
+      timeout: 5s
+
+  # ── Flyway migration ────────────────────────────────────────────────────────
+  profanity-flyway:
+    image: flyway/flyway:10-alpine
+    container_name: profanity-flyway
+    env_file: .env
+    command: >
+      -url=jdbc:postgresql://profanity-db:5432/${POSTGRES_DB}
+      -user=${POSTGRES_USER}
+      -password=${POSTGRES_PASSWORD}
+      -connectRetries=10
+      migrate
+    volumes:
+      - ./sql:/flyway/sql:ro
+    depends_on:
+      profanity-db:
+        condition: service_healthy
+
+  # ── Profanity API ───────────────────────────────────────────────────────────
+  profanity-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: profanity-api
+    env_file: .env
+    ports:
+      - "5100:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      AppInfrastructureOptions__DbConnectionString: "Host=profanity-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+    depends_on:
+      profanity-flyway:
+        condition: service_completed_successfully
+
+volumes:
+  profanity-db-data:
+
