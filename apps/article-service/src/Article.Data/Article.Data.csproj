@@ -19,9 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Article.Services\Article.Services.csproj" />
       <ProjectReference Include="..\models\models.csproj" />
-      <ProjectReference Include="..\Domain\Domain.csproj" />
       <ProjectReference Include="..\Options\Options.csproj" />
     </ItemGroup>
 
