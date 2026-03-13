@@ -1,8 +1,10 @@
-﻿using Article.Data.configuration;
+﻿using System.Runtime.InteropServices.JavaScript;
+using Article.Data.configuration;
 using Article.Data.entities;
 using Article.Services.application_interfaces.ports;
 using Domain.valueobjects;
 using Microsoft.EntityFrameworkCore;
+using models.continents;
 
 namespace Article.Data.repositories;
 
@@ -33,6 +35,19 @@ public class ArticleRepository : IArticleRepository
             .ToListAsync();
         return entities.Select(ToDomain);
     }
+
+    public async Task<IEnumerable<Domain.Article>> GetTopLatestArticles(int count)
+    {
+        await using var context = CreateContext();
+        var cutoff = DateTime.UtcNow.AddDays(-count);
+        var entities = await context.Articles
+            .Include(a => a.Authors)
+            .AsNoTracking()
+            .OrderByDescending(a => a.Timestamp>=cutoff)
+            .ToListAsync();
+        return entities.Select(ToDomain);
+    }
+
 
     public async Task<Domain.Article?> GetByIdAsync(Guid id)
     {

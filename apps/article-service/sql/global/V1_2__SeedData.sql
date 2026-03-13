@@ -12,7 +12,12 @@ INSERT INTO [Articles] ([ArticleId], [Name], [Content], [Timestamp]) VALUES
 ('a1b2c3d4-0007-0000-0000-000000000007', '[Global] Quantum Computing Milestones', 'Quantum computers have achieved new performance benchmarks, surpassing classical computers on specific problem sets. Tech giants and startups alike are racing to develop practical quantum applications.', '2026-02-17 14:30:00'),
 ('a1b2c3d4-0008-0000-0000-000000000008', '[Global] Mental Health Awareness in the Digital Age', 'Rising rates of anxiety and depression are prompting a global conversation about mental health. Digital platforms and apps are playing a dual role — both contributing to stress and offering new tools for therapy and support.', '2026-02-24 09:00:00'),
 ('a1b2c3d4-0009-0000-0000-000000000009', '[Global] Electric Vehicles Dominate Auto Market', 'Electric vehicle sales have surpassed internal combustion engine cars in several major markets. Government incentives, expanding charging infrastructure, and falling battery costs are fuelling rapid adoption.', '2026-03-03 10:00:00'),
-('a1b2c3d4-0010-0000-0000-000000000010', '[Global] Cybersecurity in a Connected World', 'As more devices connect to the internet, cybersecurity threats are growing in scale and sophistication. Organisations are urged to adopt zero-trust security models and invest in employee awareness training.', '2026-03-09 11:30:00');
+('a1b2c3d4-0010-0000-0000-000000000010', '[Global] Cybersecurity in a Connected World', 'As more devices connect to the internet, cybersecurity threats are growing in scale and sophistication. Organisations are urged to adopt zero-trust security models and invest in employee awareness training.', '2026-03-09 11:30:00'),
+('a1b2c3d4-0011-0000-0000-000000000011', '[Global] Fusion Energy Pilot Reaches Net Gain', 'A multinational research team has reported a sustained net energy gain during a controlled fusion pilot. The result is being hailed as a major milestone toward commercially viable clean baseload power.', '2026-03-10 08:15:00'),
+('a1b2c3d4-0012-0000-0000-000000000012', '[Global] AI-Assisted Drug Discovery Speeds Up Trials', 'Pharmaceutical companies are using AI-assisted modelling to identify promising compounds faster and reduce early-stage trial costs. Regulators are now studying how to validate machine-generated candidate selections.', '2026-03-11 12:00:00'),
+('a1b2c3d4-0013-0000-0000-000000000013', '[Global] Ocean Cleanup Systems Expand to New Regions', 'Next-generation ocean cleanup vessels and autonomous barriers are being deployed in heavily polluted coastal regions. Environmental groups say the larger rollout could remove record volumes of plastic waste this year.', '2026-03-12 16:45:00'),
+('a1b2c3d4-0014-0000-0000-000000000014', '[Global] Global Semiconductor Output Hits New High', 'Chip manufacturers have announced a record quarter as new fabrication plants come online across several continents. Analysts expect improved supply to lower prices for consumer electronics and electric vehicles.', '2026-03-13 09:20:00'),
+('a1b2c3d4-0015-0000-0000-000000000015', '[Global] Climate Adaptation Funds Reach Historic Levels', 'Governments and development banks have pledged historic levels of climate adaptation funding for flood defences, drought resilience, and heat mitigation projects. Experts say delivery speed will now be the key challenge.', '2026-03-13 18:10:00');
 
 -- Seed ArticleAuthors (Global)
 INSERT INTO [ArticleAuthors] ([Id], [ArticleId], [AuthorId]) VALUES
@@ -25,5 +30,9 @@ INSERT INTO [ArticleAuthors] ([Id], [ArticleId], [AuthorId]) VALUES
 ('b1c2d3e4-0007-0000-0000-000000000007', 'a1b2c3d4-0007-0000-0000-000000000007', 'c1d2e3f4-0002-0000-0000-000000000002'),
 ('b1c2d3e4-0008-0000-0000-000000000008', 'a1b2c3d4-0008-0000-0000-000000000008', 'c1d2e3f4-0005-0000-0000-000000000005'),
 ('b1c2d3e4-0009-0000-0000-000000000009', 'a1b2c3d4-0009-0000-0000-000000000009', 'c1d2e3f4-0003-0000-0000-000000000003'),
-('b1c2d3e4-0010-0000-0000-000000000010', 'a1b2c3d4-0010-0000-0000-000000000010', 'c1d2e3f4-0004-0000-0000-000000000004');
-
+('b1c2d3e4-0010-0000-0000-000000000010', 'a1b2c3d4-0010-0000-0000-000000000010', 'c1d2e3f4-0004-0000-0000-000000000004'),
+('b1c2d3e4-0011-0000-0000-000000000011', 'a1b2c3d4-0011-0000-0000-000000000011', 'c1d2e3f4-0001-0000-0000-000000000001'),
+('b1c2d3e4-0012-0000-0000-000000000012', 'a1b2c3d4-0012-0000-0000-000000000012', 'c1d2e3f4-0002-0000-0000-000000000002'),
+('b1c2d3e4-0013-0000-0000-000000000013', 'a1b2c3d4-0013-0000-0000-000000000013', 'c1d2e3f4-0003-0000-0000-000000000003'),
+('b1c2d3e4-0014-0000-0000-000000000014', 'a1b2c3d4-0014-0000-0000-000000000014', 'c1d2e3f4-0004-0000-0000-000000000004'),
+('b1c2d3e4-0015-0000-0000-000000000015', 'a1b2c3d4-0015-0000-0000-000000000015', 'c1d2e3f4-0005-0000-0000-000000000005');
