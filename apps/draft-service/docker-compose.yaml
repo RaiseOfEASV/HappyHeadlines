@@ -53,6 +53,9 @@ services:
     depends_on:
       draft-flyway:
         condition: service_completed_successfully
+    networks:
+      - default
+      - observability
 
   # ── Draft Frontend ───────────────────────────────────────────────────────────
   draft-frontend:
@@ -65,29 +68,10 @@ services:
     depends_on:
       - draft-service
 
-  # ── Seq (structured log UI) ──────────────────────────────────────────────────
-  seq:
-    image: datalust/seq:latest
-    container_name: draft-seq
-    env_file: .env
-    environment:
-      ACCEPT_EULA: "Y"
-      SEQ_FIRSTRUN_ADMINPASSWORD: ${SEQ_ADMIN_PASSWORD}
-    ports:
-      - "5341:80"            # UI  →  http://localhost:5341
-    volumes:
-      - seq-data:/data
-
-  # ── Jaeger (distributed tracing UI) ──────────────────────────────────────────
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    container_name: draft-jaeger
-    environment:
-      COLLECTOR_OTLP_ENABLED: "true"
-    ports:
-      - "16686:16686"        # UI   →  http://localhost:16686
-      - "4317:4317"          # OTLP gRPC receiver  (backend)
+networks:
+  observability:
+    external: true
+    name: happyheadlines-observability
 
 volumes:
   draft-db-data:
-  seq-data:
