@@ -11,6 +11,7 @@ public static class ServiceExtensions
     {
 
         services.AddScoped<IArticleService, ArticleService>();
+        services.AddHostedService<ArticleLoaderBackgroundservice>();
         return services;
     }
 }

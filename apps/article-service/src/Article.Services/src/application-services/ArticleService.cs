@@ -5,11 +5,19 @@ using models.continents;
 
 namespace Article.Services.application_services;
 
-public class ArticleService(IArticleRepository articleRepository,IContinentContext continentContext) : IArticleService
+public class ArticleService(IArticleRepository articleRepository,IContinentContext continentContext,ICacheService cacheService) : IArticleService
 {
     public async Task<IEnumerable<ArticleDto>> GetAllArticlesAsync(Continent continent)
     {
         continentContext.Continent = continent;
+        if (continent == Continent.Global)
+        {
+            var cachedArticles = await cacheService.GetAsync<ArticleDto[]>($"recentArticles:{Continent.Global}");
+            if (cachedArticles!=null)
+            {
+                return cachedArticles;
+            }
+        }
         var articles = await articleRepository.GetAllAsync();
         return articles.Select(ToDto);
     }
