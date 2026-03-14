@@ -7,7 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAppOptions(builder.Configuration);
 builder.Services.AddApplicationServices();
-builder.Services.AddDataSourceAndRepositories();
+builder.Services.AddDataSourceAndRepositories(builder.Configuration);
 
 var app = builder.Build();
 
