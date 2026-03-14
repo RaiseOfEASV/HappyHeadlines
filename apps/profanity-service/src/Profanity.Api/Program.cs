@@ -1,8 +1,10 @@
+using HappyHeadlines.Logging;
 using Options;
 using Profanity.Data;
 using Profanity.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceLogging("profanity-service");
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAppOptions(builder.Configuration);
@@ -17,6 +19,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseServiceLogging();
 app.MapControllers();
 app.UseHttpsRedirection();
 app.Run();
