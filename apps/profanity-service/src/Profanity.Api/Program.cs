@@ -1,10 +1,11 @@
-using HappyHeadlines.Logging;
+using HappyHeadlines.Monitoring;
 using Options;
 using Profanity.Data;
 using Profanity.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceLogging("profanity-service");
+builder.AddServiceTracing("profanity-service");
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAppOptions(builder.Configuration);

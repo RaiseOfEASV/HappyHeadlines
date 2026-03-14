@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "packages", "{D4E5F6A7-B8C9-0123-DEF0-123456789ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyHeadlines.Logging", "../../packages/HappyHeadlines.Logging/src/HappyHeadlines.Logging.csproj", "{E5F6A7B8-C9D0-1234-EF01-23456789ABCD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyHeadlines.Monitoring", "../../packages/HappyHeadlines.Monitoring/src/HappyHeadlines.Monitoring.csproj", "{E5F6A7B8-C9D0-1234-EF01-23456789ABCD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profanity.Api", "src\Profanity.Api\Profanity.Api.csproj", "{791E13E4-1F51-4402-A23F-C2ADD42E9751}"
 EndProject

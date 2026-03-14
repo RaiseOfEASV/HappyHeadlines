@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Serilog;
+using Serilog.Enrichers.OpenTelemetry;
 using Serilog.Formatting.Compact;
 
-namespace HappyHeadlines.Logging;
+namespace HappyHeadlines.Monitoring;
 
 public static class LoggingExtensions
 {
@@ -19,6 +20,8 @@ public static class LoggingExtensions
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentName()
                 .Enrich.WithProperty("ServiceName", serviceName)
+                .Enrich.WithOpenTelemetryTraceId()
+                .Enrich.WithOpenTelemetrySpanId()
                 .WriteTo.Console(new CompactJsonFormatter());
 
             var seqUrl = context.Configuration["Seq:ServerUrl"];

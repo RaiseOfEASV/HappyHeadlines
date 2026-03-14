@@ -51,6 +51,7 @@ services:
       AppInfrastructureOptions__DbConnectionString: "Host=profanity-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       Seq__ServerUrl: "http://seq:80"
       Seq__ApiKey: ${SEQ_API_KEY}
+      Otlp__Endpoint: "http://jaeger:4317"
     depends_on:
       profanity-flyway:
         condition: service_completed_successfully
@@ -67,6 +68,16 @@ services:
       - "5341:80"
     volumes:
       - seq-data:/data
+
+  # ── Jaeger (distributed tracing UI) ─────────────────────────────────────────
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: profanity-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4317:4317"     # OTLP gRPC receiver
 
 volumes:
   profanity-db-data:
