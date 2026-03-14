@@ -3,18 +3,21 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy solution and all csproj files first for layer-cached restore
-COPY ProfanityService.sln ./
-COPY src/Profanity.Api/Profanity.Api.csproj         src/Profanity.Api/
-COPY src/Profanity.Services/Profanity.Services.csproj src/Profanity.Services/
-COPY src/Profanity.Data/Profanity.Data.csproj        src/Profanity.Data/
-COPY src/Domain/Domain.csproj                        src/Domain/
-COPY src/Options/Options.csproj                      src/Options/
+COPY apps/profanity-service/ProfanityService.sln                                      apps/profanity-service/
+COPY apps/profanity-service/src/Profanity.Api/Profanity.Api.csproj                    apps/profanity-service/src/Profanity.Api/
+COPY apps/profanity-service/src/Profanity.Services/Profanity.Services.csproj          apps/profanity-service/src/Profanity.Services/
+COPY apps/profanity-service/src/Profanity.Data/Profanity.Data.csproj                  apps/profanity-service/src/Profanity.Data/
+COPY apps/profanity-service/src/Domain/Domain.csproj                                  apps/profanity-service/src/Domain/
+COPY apps/profanity-service/src/Options/Options.csproj                                apps/profanity-service/src/Options/
+COPY packages/HappyHeadlines.Monitoring/src/HappyHeadlines.Monitoring.csproj               packages/HappyHeadlines.Monitoring/src/
 
-RUN dotnet restore
+RUN dotnet restore apps/profanity-service/ProfanityService.sln
 
 # Copy the rest of the source and publish
-COPY src/ src/
-RUN dotnet publish src/Profanity.Api/Profanity.Api.csproj \
+COPY apps/profanity-service/src/    apps/profanity-service/src/
+COPY packages/HappyHeadlines.Monitoring/src/  packages/HappyHeadlines.Monitoring/src/
+
+RUN dotnet publish apps/profanity-service/src/Profanity.Api/Profanity.Api.csproj \
     -c Release \
     -o /app/publish
 
