@@ -97,7 +97,7 @@ export function PublicationList({ publications, onViewStatus }: Props) {
           )}
 
           <div style={{ fontSize: '0.875rem', color: '#888' }}>
-            {new Date(pub.timestamp).toLocaleString()}
+            {new Date(pub.publishInitiatedAt).toLocaleString()}
           </div>
         </div>
       ))}

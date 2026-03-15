@@ -5,9 +5,10 @@ import { getPublication } from '../services/publisherService'
 interface Props {
   publicationId: string
   onClose: () => void
+  onPublished?: () => void
 }
 
-export function PublicationStatus({ publicationId, onClose }: Props) {
+export function PublicationStatus({ publicationId, onClose, onPublished }: Props) {
   const [publication, setPublication] = useState<Publication | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -21,7 +22,10 @@ export function PublicationStatus({ publicationId, onClose }: Props) {
         setPublication(pub)
         setLoading(false)
 
-        if (pub.status === 'Published' || pub.status === 'Failed') {
+        if (pub.status === 'Published') {
+          if (intervalId) clearInterval(intervalId)
+          onPublished?.()
+        } else if (pub.status === 'Failed') {
           if (intervalId) clearInterval(intervalId)
         }
       } catch (err) {
@@ -141,7 +145,10 @@ export function PublicationStatus({ publicationId, onClose }: Props) {
             )}
 
             <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#888' }}>
-              {new Date(publication.timestamp).toLocaleString()}
+              Initiated: {new Date(publication.publishInitiatedAt).toLocaleString()}
+              {publication.publishCompletedAt && (
+                <span> &middot; Completed: {new Date(publication.publishCompletedAt).toLocaleString()}</span>
+              )}
             </div>
           </div>
         )}

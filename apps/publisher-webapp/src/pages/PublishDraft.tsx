@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { PublicationStatus } from '../components/PublicationStatus'
 import type { Draft } from '../types'
-import { fetchDrafts } from '../services/draftService'
+import { fetchDrafts, deleteDraft } from '../services/draftService'
 import { publishDraft } from '../services/publisherService'
 
 export function PublishDraft() {
@@ -100,6 +100,11 @@ export function PublishDraft() {
       <PublicationStatus
         publicationId={publicationId}
         onClose={() => navigate('/')}
+        onPublished={async () => {
+          if (draft) {
+            try { await deleteDraft(draft.id) } catch { /* ignore */ }
+          }
+        }}
       />
     )
   }

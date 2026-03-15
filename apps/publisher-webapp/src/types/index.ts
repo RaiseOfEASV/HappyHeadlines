@@ -32,5 +32,6 @@ export interface Publication {
   status: 'Publishing' | 'Published' | 'Failed'
   articleId?: string
   errorMessage?: string
-  timestamp: string
+  publishInitiatedAt: string
+  publishCompletedAt?: string
 }
