@@ -1,11 +1,13 @@
 using Comment.Data.configuration;
 using Comment.Data.entities;
+using MessageClient.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SharedContracts.contracts;
 
 namespace Comment.Services;
 
-public class CommentService(CommentDbContext db, IProfanityClient profanityClient, ILogger<CommentService> logger,CommentsCacheService commentsCacheService) : ICommentService
+public class CommentService(CommentDbContext db,IMessageClient messageClient, IProfanityClient profanityClient, ILogger<CommentService> logger,CommentsCacheService commentsCacheService) : ICommentService
 {
     public async Task<IEnumerable<CommentDto>> GetByArticleAsync(Guid articleId)
     {
@@ -29,7 +31,12 @@ public class CommentService(CommentDbContext db, IProfanityClient profanityClien
 
     public async Task<CommentDto> CreateAsync(CreateCommentDto dto)
     {
+
+        
+ 
+        
         string filteredContent;
+  
         try
         {
             filteredContent = await profanityClient.FilterAsync(dto.Content);
@@ -41,7 +48,6 @@ public class CommentService(CommentDbContext db, IProfanityClient profanityClien
             logger.LogWarning(ex, "ProfanityService unavailable — saving comment without profanity filtering.");
             filteredContent = dto.Content;
         }
-
         var entity = new CommentEntity
         {
             CommentId = Guid.NewGuid(),
@@ -50,6 +56,8 @@ public class CommentService(CommentDbContext db, IProfanityClient profanityClien
             Content = filteredContent,
             CreatedAt = DateTime.UtcNow,
         };
+        var commentCreated = new CommentCreatedEvent(entity.CommentId,dto.Content);
+        messageClient.PublishAsync<CommentCreatedEvent>(commentCreated);
 
         db.Comments.Add(entity);
         await db.SaveChangesAsync();

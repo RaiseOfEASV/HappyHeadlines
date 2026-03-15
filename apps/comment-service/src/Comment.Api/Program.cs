@@ -1,5 +1,7 @@
 using Comment.Data;
 using Comment.Services;
+using MessageClient.Configuration;
+using MessageClient.Extension;
 using Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAppOptions(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddDataSourceAndRepositories(builder.Configuration);
+builder.Services.AddRabbitMqMessageClient(
+    new RabbitMqClientOptions { ConnectionString = "host=rabbitmq" }, 
+    new MessageHandlerOptions { SubscriptionPrefix = "comment"}
+);
 
 var app = builder.Build();
 
