@@ -18,7 +18,11 @@ export async function createDraft(data: CreateDraftRequest): Promise<Draft> {
   const res = await fetch(BASE_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      Title: data.title,
+      Content: data.content,
+      AuthorId: data.authorId,
+    }),
   })
   if (!res.ok) throw new Error('Failed to create draft')
   return res.json()
@@ -28,7 +32,10 @@ export async function updateDraft(id: string, data: UpdateDraftRequest): Promise
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      Title: data.title,
+      Content: data.content,
+    }),
   })
   if (!res.ok) throw new Error('Failed to update draft')
   return res.json()
