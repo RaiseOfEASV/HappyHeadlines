@@ -1,0 +1,162 @@
+{
+  "title": "Cache Hit Ratio",
+  "uid": "cache-hit-ratio",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Article Cache Hit Ratio",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto",
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 80 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(article_cache_hits_total[5m]) / (rate(article_cache_hits_total[5m]) + rate(article_cache_misses_total[5m])) * 100",
+          "legendFormat": "Article Hit Ratio %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Comment Cache Hit Ratio",
+      "type": "stat",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto",
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 80 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(comment_cache_hits_total[5m]) / (rate(comment_cache_hits_total[5m]) + rate(comment_cache_misses_total[5m])) * 100",
+          "legendFormat": "Comment Hit Ratio %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Article Cache — Total Hits vs Misses",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "orientation": "horizontal"
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Hits" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Misses" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        { "expr": "article_cache_hits_total", "legendFormat": "Hits", "refId": "A" },
+        { "expr": "article_cache_misses_total", "legendFormat": "Misses", "refId": "B" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Comment Cache — Total Hits vs Misses",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "orientation": "horizontal"
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Hits" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Misses" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        { "expr": "comment_cache_hits_total", "legendFormat": "Hits", "refId": "A" },
+        { "expr": "comment_cache_misses_total", "legendFormat": "Misses", "refId": "B" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Article Cache — Hits & Misses Over Time",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Hits/s" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Misses/s" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        { "expr": "rate(article_cache_hits_total[1m])", "legendFormat": "Hits/s", "refId": "A" },
+        { "expr": "rate(article_cache_misses_total[1m])", "legendFormat": "Misses/s", "refId": "B" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Comment Cache — Hits & Misses Over Time",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Hits/s" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Misses/s" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        { "expr": "rate(comment_cache_hits_total[1m])", "legendFormat": "Hits/s", "refId": "A" },
+        { "expr": "rate(comment_cache_misses_total[1m])", "legendFormat": "Misses/s", "refId": "B" }
+      ]
+    }
+  ]
+}
