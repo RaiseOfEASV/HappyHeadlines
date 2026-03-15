@@ -166,9 +166,9 @@ check_requirements() {
 
     if command_exists nc; then
         declare -A REQUIRED_PORTS=(
-            [80]="ArticleService"
             [3000]="webapp-service"
             [5100]="ProfanityService"
+            [5200]="ArticleService"
             [5300]="PublisherService"
             [5341]="Seq"
             [5400]="NewsletterService"
@@ -567,7 +567,7 @@ show_access_info() {
     echo "📡 API Services:"
     echo "   DraftService:          http://localhost:8080"
     echo "   PublisherService:      http://localhost:5300"
-    echo "   ArticleService:        http://localhost:80"
+    echo "   ArticleService:        http://localhost:5200"
     echo "   NewsletterService:     http://localhost:5400"
     echo "   CommentService:        http://localhost:5542"
     echo "   ProfanityService:      http://localhost:5100"

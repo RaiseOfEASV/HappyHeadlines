@@ -13,13 +13,13 @@ services:
       - VITE_PUBLISHER_SERVICE_URL=http://publisher-service:8080
       - VITE_JAEGER_ENDPOINT=http://jaeger:4318/v1/traces
     networks:
-      - happy-headlines
+      - services
       - observability
 
 networks:
-  happy-headlines:
-    external: false
-    name: happy-headlines
+  services:
+    external: true
+    name: happyheadlines-services
   observability:
     external: true
     name: happyheadlines-observability

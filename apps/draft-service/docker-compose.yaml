@@ -56,11 +56,15 @@ services:
     networks:
       - default
       - observability
+      - services
 
 networks:
   observability:
     external: true
     name: happyheadlines-observability
+  services:
+    external: true
+    name: happyheadlines-services
 
 volumes:
   draft-db-data:

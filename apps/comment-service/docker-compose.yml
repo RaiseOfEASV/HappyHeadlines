@@ -72,7 +72,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       AppInfrastructureOptions__DbConnectionString: "Host=comment-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
-      AppInfrastructureOptions__ProfanityServiceUrl: "http://host.docker.internal:5100"
+      AppInfrastructureOptions__ProfanityServiceUrl: "http://profanity-api:8080"
       Redis__ConnectionString: ${Redis__ConnectionString}
     depends_on:
       comment-flyway:
@@ -80,6 +80,7 @@ services:
     networks:
       - default
       - messaging
+      - services
   comment-api-2:
     <<: *api
 
@@ -87,6 +88,9 @@ networks:
   messaging:
     external: true
     name: happyheadlines-messaging
+  services:
+    external: true
+    name: happyheadlines-services
 
 volumes:
   comment-db-data:

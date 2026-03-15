@@ -20,13 +20,16 @@
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"
+      - "5200:80"
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
     depends_on:
       - articles-api-1
       - articles-api-2
       - articles-api-3
+    networks:
+      - default
+      - services
   articles-api-1: &api
     build:
       context: .
@@ -191,6 +194,11 @@
       FLYWAY_PASSWORD: ${SA_PASSWORD}
       FLYWAY_SCHEMAS: dbo
       FLYWAY_CONNECT_RETRIES: 30
+
+networks:
+  services:
+    external: true
+    name: happyheadlines-services
 
 volumes:
   article-db-data:

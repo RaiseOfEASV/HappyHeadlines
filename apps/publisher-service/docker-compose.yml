@@ -64,6 +64,7 @@ services:
       - default
       - observability
       - messaging
+      - services
 
 networks:
   observability:
@@ -72,6 +73,9 @@ networks:
   messaging:
     external: true
     name: happyheadlines-messaging
+  services:
+    external: true
+    name: happyheadlines-services
 
 volumes:
   publisher-db-data:
