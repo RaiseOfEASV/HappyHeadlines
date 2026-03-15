@@ -18,6 +18,14 @@ export function DraftForm({ onSubmit, onCancel }: Props) {
     setLoading(true)
     setError(null)
 
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(authorId)) {
+      setError('Author ID must be a valid UUID (e.g., 123e4567-e89b-12d3-a456-426614174000)')
+      setLoading(false)
+      return
+    }
+
     try {
       await onSubmit({ title, content, authorId })
       setTitle('')
@@ -103,6 +111,7 @@ export function DraftForm({ onSubmit, onCancel }: Props) {
           value={authorId}
           onChange={(e) => setAuthorId(e.target.value)}
           required
+          placeholder="e.g., 123e4567-e89b-12d3-a456-426614174000"
           style={{
             width: '100%',
             padding: '0.75rem',
