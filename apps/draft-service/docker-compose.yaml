@@ -57,17 +57,6 @@ services:
       - default
       - observability
 
-  # ── Draft Frontend ───────────────────────────────────────────────────────────
-  draft-frontend:
-    build:
-      context: ../draft-frontend
-      dockerfile: Dockerfile
-    container_name: draft-frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - draft-service
-
 networks:
   observability:
     external: true
