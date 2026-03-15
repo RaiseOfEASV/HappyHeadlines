@@ -13,7 +13,7 @@ namespace Article.Data
         {
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = configuration["Redis:ConnectionString"];
+                options.Configuration = configuration["AppInfrastructureOptions:RedisConnectionString"];  
             });
 
             services.AddSingleton<ArticleDbContextFactory>();

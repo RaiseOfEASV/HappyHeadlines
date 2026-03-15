@@ -5,17 +5,27 @@ using Microsoft.Extensions.Logging;
 
 namespace Comment.Services;
 
-public class CommentService(CommentDbContext db, IProfanityClient profanityClient, ILogger<CommentService> logger) : ICommentService
+public class CommentService(CommentDbContext db, IProfanityClient profanityClient, ILogger<CommentService> logger,CommentsCacheService commentsCacheService) : ICommentService
 {
     public async Task<IEnumerable<CommentDto>> GetByArticleAsync(Guid articleId)
     {
+        var cache = await commentsCacheService.GetByArticleAsync(articleId);
+        if (cache != null)
+        {
+            logger.LogInformation($"Getting comments for {articleId}");
+            return cache.Select(c => new CommentDto(c.CommentId, c.ArticleId, c.AuthorId, c.Content, c.CreatedAt));
+        }
+    
         var comments = await db.Comments
             .Where(c => c.ArticleId == articleId)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
-
-        return comments.Select(c => new CommentDto(c.CommentId, c.ArticleId, c.AuthorId, c.Content, c.CreatedAt));
+        var commentsDtos = comments.Select(c =>
+            new CommentDto(c.CommentId, c.ArticleId, c.AuthorId, c.Content, c.CreatedAt)).ToList();
+        await commentsCacheService.SetByArticleAsync(articleId, commentsDtos);
+        return commentsDtos;
     }
+
 
     public async Task<CommentDto> CreateAsync(CreateCommentDto dto)
     {

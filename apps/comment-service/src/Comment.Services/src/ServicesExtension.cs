@@ -9,6 +9,7 @@ public static class ServicesExtension
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<ICommentService, CommentService>();
+        services.AddScoped<CommentsCacheService>();
 
         services.AddHttpClient<IProfanityClient, ProfanityClient>((sp, client) =>
         {
