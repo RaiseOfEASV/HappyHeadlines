@@ -34,8 +34,9 @@ public class ArticleService(IArticleRepository articleRepository,IContinentConte
         return null;
     }
 
-    public async Task<ArticleDto> CreateArticleAsync(CreateArticleDto createArticleDto)
+    public async Task<ArticleDto> CreateArticleAsync(CreateArticleDto createArticleDto, Continent continent = Continent.Global)
     {
+        continentContext.Continent = continent;
         var article = new Domain.Article(
             ArticleName.From(createArticleDto.Name),
             ArticleContent.From(createArticleDto.Content),

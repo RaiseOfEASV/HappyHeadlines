@@ -48,6 +48,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       AppInfrastructureOptions__DbConnectionString: "Host=publisher-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       AppInfrastructureOptions__DraftServiceUrl: "http://draft-service:8080"
+      AppInfrastructureOptions__ArticleServiceUrl: "http://article-service-nginx-1:80"
       AppInfrastructureOptions__RabbitMq__Host: "happyheadlines-rabbitmq"
       AppInfrastructureOptions__RabbitMq__Port: "5672"
       AppInfrastructureOptions__RabbitMq__Username: ${RABBITMQ_USER}

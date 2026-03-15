@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Options;
 using Publisher.Services.Clients;
+using Publisher.Services.Consumers;
 
 namespace Publisher.Services;
 
@@ -20,6 +21,14 @@ public static class ServicesExtension
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
+        // Add HTTP client for ArticleService
+        services.AddHttpClient<IArticleServiceClient, ArticleServiceClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<IOptions<AppOptions>>().Value;
+            client.BaseAddress = new Uri(options.ArticleServiceUrl);
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+
         return services;
     }
 
@@ -27,6 +36,8 @@ public static class ServicesExtension
     {
         services.AddMassTransit(x =>
         {
+            x.AddConsumer<PublishArticleCommandConsumer>();
+
             x.UsingRabbitMq((context, cfg) =>
             {
                 var options = context.GetRequiredService<IOptions<AppOptions>>().Value.RabbitMq;
@@ -37,7 +48,11 @@ public static class ServicesExtension
                     h.Password(options.Password);
                 });
 
-                cfg.ConfigureEndpoints(context);
+                cfg.ReceiveEndpoint("publisher.publish-article", e =>
+                {
+                    e.ConfigureConsumer<PublishArticleCommandConsumer>(context);
+                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+                });
             });
         });
 

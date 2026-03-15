@@ -4,6 +4,7 @@ public class AppOptions
 {
     public string DbConnectionString { get; set; } = string.Empty;
     public string DraftServiceUrl { get; set; } = string.Empty;
+    public string ArticleServiceUrl { get; set; } = string.Empty;
     public RabbitMqOptions RabbitMq { get; set; } = new();
 }
 

@@ -7,7 +7,7 @@ public interface IArticleService
 {
     Task<IEnumerable<ArticleDto>> GetAllArticlesAsync(Continent continent);
     Task<ArticleDto?> GetArticleByIdAsync(Guid id);
-    Task<ArticleDto> CreateArticleAsync(CreateArticleDto createArticleDto);
+    Task<ArticleDto> CreateArticleAsync(CreateArticleDto createArticleDto, Continent continent = Continent.Global);
     Task<ArticleDto?> UpdateArticleAsync(Guid id, UpdateArticleDto updateArticleDto);
     Task<bool> DeleteArticleAsync(Guid id);
 }
