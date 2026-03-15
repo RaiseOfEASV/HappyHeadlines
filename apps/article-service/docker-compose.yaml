@@ -32,8 +32,8 @@
       - services
   articles-api-1: &api
     build:
-      context: .
-      dockerfile: src/Article.Api/Dockerfile
+      context: ../..
+      dockerfile: apps/article-service/src/Article.Api/Dockerfile
     expose:
       - "8080"
     environment:
@@ -48,6 +48,9 @@
       - AppInfrastructureOptions__NorthAmerica=${NorthAmerica}
       - AppInfrastructureOptions__Antarctica=${Antarctica}
       - AppInfrastructureOptions__Redis__ConnectionString=redis:6379
+      - Seq__ServerUrl=http://seq:80
+      - Seq__ApiKey=${SEQ_API_KEY}
+      - Otlp__Endpoint=http://jaeger:4317
     depends_on:
       redis:
         condition: service_healthy
@@ -69,6 +72,9 @@
         condition: service_completed_successfully
       flyway-antarctica:
         condition: service_completed_successfully
+    networks:
+      - default
+      - observability
 
   articles-api-2:
     <<: *api
@@ -199,6 +205,9 @@ networks:
   services:
     external: true
     name: happyheadlines-services
+  observability:
+    external: true
+    name: happyheadlines-observability
 
 volumes:
   article-db-data:
