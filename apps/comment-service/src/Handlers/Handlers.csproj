@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\packages\SharedContracts\SharedContracts.csproj" />
+        <ProjectReference Include="..\..\..\..\packages\MessageClient\MessageClient.csproj" />
+    </ItemGroup>
+</Project>

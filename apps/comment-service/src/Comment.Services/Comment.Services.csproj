@@ -7,13 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.13" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.13" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.3" />
     <PackageReference Include="Polly" Version="8.5.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\packages\MessageClient\MessageClient.csproj" />
+    <ProjectReference Include="..\..\..\..\packages\SharedContracts\SharedContracts.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Comment.Data\Comment.Data.csproj" />
     <ProjectReference Include="..\Options\Options.csproj" />

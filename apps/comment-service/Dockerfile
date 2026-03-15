@@ -3,18 +3,26 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy solution and all csproj files first for layer-cached restore
-COPY CommentService.sln ./
-COPY src/Comment.Api/Comment.Api.csproj         src/Comment.Api/
-COPY src/Comment.Services/Comment.Services.csproj src/Comment.Services/
-COPY src/Comment.Data/Comment.Data.csproj        src/Comment.Data/
-COPY src/Domain/Domain.csproj                    src/Domain/
-COPY src/Options/Options.csproj                  src/Options/
+COPY apps/comment-service/CommentService.sln                         apps/comment-service/
+COPY apps/comment-service/src/Comment.Api/Comment.Api.csproj         apps/comment-service/src/Comment.Api/
+COPY apps/comment-service/src/Comment.Services/Comment.Services.csproj apps/comment-service/src/Comment.Services/
+COPY apps/comment-service/src/Comment.Data/Comment.Data.csproj       apps/comment-service/src/Comment.Data/
+COPY apps/comment-service/src/Domain/Domain.csproj                   apps/comment-service/src/Domain/
+COPY apps/comment-service/src/Options/Options.csproj                 apps/comment-service/src/Options/
+COPY apps/comment-service/src/Handlers/Handlers.csproj               apps/comment-service/src/Handlers/
 
-RUN dotnet restore
+# Copy shared package csproj files
+COPY packages/MessageClient/MessageClient.csproj                     packages/MessageClient/
+COPY packages/SharedContracts/SharedContracts.csproj                 packages/SharedContracts/
+
+RUN dotnet restore apps/comment-service/CommentService.sln
 
 # Copy the rest of the source and publish
-COPY src/ src/
-RUN dotnet publish src/Comment.Api/Comment.Api.csproj \
+COPY apps/comment-service/src/ apps/comment-service/src/
+COPY packages/MessageClient/   packages/MessageClient/
+COPY packages/SharedContracts/ packages/SharedContracts/
+
+RUN dotnet publish apps/comment-service/src/Comment.Api/Comment.Api.csproj \
     -c Release \
     -o /app/publish
 

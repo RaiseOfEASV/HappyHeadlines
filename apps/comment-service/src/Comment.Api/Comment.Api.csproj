@@ -12,6 +12,7 @@
       Design package stays here so `dotnet ef` CLI works with this as the startup project.
       PrivateAssets=all ensures it is never published into the Docker image.
     -->
+
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.13">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,5 +22,7 @@
     <ProjectReference Include="..\Comment.Services\Comment.Services.csproj" />
     <ProjectReference Include="..\Comment.Data\Comment.Data.csproj" />
     <ProjectReference Include="..\Options\Options.csproj" />
+    <ProjectReference Include="..\Handlers\Handlers.csproj" />
+    <ProjectReference Include="..\..\..\..\packages\MessageClient\MessageClient.csproj" />
   </ItemGroup>
 </Project>
