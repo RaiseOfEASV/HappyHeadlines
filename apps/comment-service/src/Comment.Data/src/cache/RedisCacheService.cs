@@ -1,25 +1,56 @@
 using System.Text.Json;
-using Article.Services.application_interfaces.ports;
 using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 
-namespace Article.Data.cache;
+namespace Comment.Data.cache;
 
-public class RedisCacheService(IDistributedCache cache) : ICacheService
+public class RedisCacheService(IDistributedCache cache, IConnectionMultiplexer redis) : ICacheService
 {
+    private const int MaxItems = 30;
+    private const string LruSetKey = "cache:lru_index";
+
+    private IDatabase Db => redis.GetDatabase();
+
     public async Task<T?> GetAsync<T>(string key)
     {
         var data = await cache.GetStringAsync(key);
-        return data is null ? default : JsonSerializer.Deserialize<T>(data);
+        if (data is null) return default;
+
+        await Db.SortedSetAddAsync(LruSetKey, key, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+
+        return JsonSerializer.Deserialize<T>(data);
     }
 
     public async Task SetAsync<T>(string key, T value, TimeSpan? expiry = null)
     {
+        var isNewKey = await Db.SortedSetScoreAsync(LruSetKey, key) is null;
+        if (isNewKey)
+            await EvictIfFullAsync();
+
         var options = new DistributedCacheEntryOptions();
         if (expiry.HasValue)
             options.AbsoluteExpirationRelativeToNow = expiry;
 
         await cache.SetStringAsync(key, JsonSerializer.Serialize(value), options);
+        await Db.SortedSetAddAsync(LruSetKey, key, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
-    public Task RemoveAsync(string key) => cache.RemoveAsync(key);
+    public async Task RemoveAsync(string key)
+    {
+        await cache.RemoveAsync(key);
+        await Db.SortedSetRemoveAsync(LruSetKey, key);
+    }
+
+    private async Task EvictIfFullAsync()
+    {
+        var count = await Db.SortedSetLengthAsync(LruSetKey);
+        if (count < MaxItems) return;
+
+        var oldest = await Db.SortedSetRangeByRankAsync(LruSetKey, 0, 0);
+        if (oldest.Length == 0) return;
+
+        var oldestKey = oldest[0].ToString();
+        await cache.RemoveAsync(oldestKey);
+        await Db.SortedSetRemoveAsync(LruSetKey, oldestKey);
+    }
 }

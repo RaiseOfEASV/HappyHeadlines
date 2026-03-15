@@ -1,5 +1,28 @@
 services:
-
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  redisinsight:
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis 
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d/
+    depends_on:
+      - comment-api
   # ── PostgreSQL ──────────────────────────────────────────────────────────────
   comment-db:
     image: postgres:17-alpine
@@ -30,6 +53,7 @@ services:
       -user=${POSTGRES_USER}
       -password=${POSTGRES_PASSWORD}
       -connectRetries=10
+      -locations=filesystem:/flyway/sql,filesystem:/flyway/sql/seedData
       migrate
     volumes:
       - ./sql:/flyway/sql:ro
@@ -50,6 +74,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       AppInfrastructureOptions__DbConnectionString: "Host=comment-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       AppInfrastructureOptions__ProfanityServiceUrl: "http://host.docker.internal:5100"
+      Redis__ConnectionString: ${Redis__ConnectionString}
     depends_on:
       comment-flyway:
         condition: service_completed_successfully

@@ -1,6 +1,6 @@
 
 
-namespace Comment.Services;
+namespace Comment.Data.cache;
 
 public interface ICacheService
 {
