@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5435:5432"          # host 5435 → container 5432 (avoids conflict with other DBs)
+      - "5436:5432"          # host 5436 → container 5432 (avoids conflict with other DBs)
     volumes:
       - publisher-db-data:/var/lib/postgresql/data
     healthcheck:

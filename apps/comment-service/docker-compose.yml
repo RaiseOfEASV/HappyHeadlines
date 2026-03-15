@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
@@ -12,13 +12,13 @@ services:
   redisinsight:
     image: redis/redisinsight:latest
     ports:
-      - "5540:5540"
+      - "5541:5540"
     depends_on:
       - redis 
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"
+      - "5542:80"
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
     depends_on:
@@ -33,7 +33,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5434:5432"          # host 5434 → container 5432 (avoids conflict with other DBs)
+      - "5435:5432"          # host 5435 → container 5432 (avoids conflict with other DBs)
     volumes:
       - comment-db-data:/var/lib/postgresql/data
     healthcheck:

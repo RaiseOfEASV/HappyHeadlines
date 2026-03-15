@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Project root directory (parent of scripts/)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # ==========================================
 # Utility Functions
@@ -168,9 +168,11 @@ check_requirements() {
         declare -A REQUIRED_PORTS=(
             [80]="ArticleService"
             [3000]="webapp-service"
+            [5100]="ProfanityService"
             [5300]="PublisherService"
             [5341]="Seq"
             [5400]="NewsletterService"
+            [5542]="CommentService"
             [5672]="RabbitMQ"
             [8080]="DraftService"
             [15672]="RabbitMQ Management"
@@ -215,6 +217,13 @@ start_services() {
     print_info "Cleaning up any orphaned containers..."
     docker stop draft-frontend 2>/dev/null || true
     docker rm draft-frontend 2>/dev/null || true
+
+    # Clean up stale database containers that might be in 'Created' state
+    for container in comment-db profanity-db draft-db publisher-db newsletter-db; do
+        if docker ps -a --filter "name=$container" --filter "status=created" --format "{{.Names}}" | grep -q "$container"; then
+            docker rm "$container" 2>/dev/null || true
+        fi
+    done
 
     print_info "Starting infrastructure services..."
 
@@ -267,6 +276,32 @@ start_services() {
     fi
     cd "$SCRIPT_DIR"
     print_success "DraftService started"
+
+    sleep 3
+
+    # Start ProfanityService
+    print_info "Starting ProfanityService..."
+    cd apps/profanity-service
+    if ! docker-compose up --build -d; then
+        print_error "Failed to start ProfanityService"
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+    cd "$SCRIPT_DIR"
+    print_success "ProfanityService started"
+
+    sleep 3
+
+    # Start CommentService
+    print_info "Starting CommentService..."
+    cd apps/comment-service
+    if ! docker-compose up --build -d; then
+        print_error "Failed to start CommentService"
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+    cd "$SCRIPT_DIR"
+    print_success "CommentService started"
 
     sleep 3
 
@@ -348,6 +383,16 @@ stop_services() {
     cd "$SCRIPT_DIR"
     print_success "DraftService stopped"
 
+    cd apps/comment-service
+    docker-compose down
+    cd "$SCRIPT_DIR"
+    print_success "CommentService stopped"
+
+    cd apps/profanity-service
+    docker-compose down
+    cd "$SCRIPT_DIR"
+    print_success "ProfanityService stopped"
+
     cd apps/article-service
     docker-compose down
     cd "$SCRIPT_DIR"
@@ -391,6 +436,8 @@ check_status() {
 
     print_header "Application Services"
     check_container "draft-service" "DraftService"
+    check_container "profanity-api" "ProfanityService"
+    check_container "comment-api-1" "CommentService"
     check_container "publisher-service" "PublisherService"
     check_container "newsletter-service" "NewsletterService"
     check_container "webapp-service" "webapp-service"
@@ -398,6 +445,8 @@ check_status() {
 
     print_header "Database Services"
     check_container "draft-db" "DraftService DB"
+    check_container "profanity-db" "ProfanityService DB"
+    check_container "comment-db" "CommentService DB"
     check_container "publisher-db" "PublisherService DB"
     check_container "newsletter-db" "NewsletterService DB"
     check_container "article-db" "ArticleService DB"
@@ -424,39 +473,49 @@ show_logs() {
     echo "Select a service to view logs:"
     echo ""
     echo "  1) DraftService"
-    echo "  2) PublisherService"
-    echo "  3) ArticleService"
-    echo "  4) NewsletterService"
-    echo "  5) webapp-service"
-    echo "  6) RabbitMQ"
-    echo "  7) All services"
+    echo "  2) ProfanityService"
+    echo "  3) CommentService"
+    echo "  4) PublisherService"
+    echo "  5) ArticleService"
+    echo "  6) NewsletterService"
+    echo "  7) webapp-service"
+    echo "  8) RabbitMQ"
+    echo "  9) All services"
     echo "  0) Cancel"
     echo ""
-    read -p "Enter choice [0-7]: " choice
+    read -p "Enter choice [0-9]: " choice
 
     case $choice in
         1)
             docker logs -f draft-service
             ;;
         2)
-            docker logs -f publisher-service
+            docker logs -f profanity-api
             ;;
         3)
-            docker logs -f articles-api-1
+            docker logs -f comment-api-1
             ;;
         4)
-            docker logs -f newsletter-service
+            docker logs -f publisher-service
             ;;
         5)
-            docker logs -f webapp-service
+            docker logs -f articles-api-1
             ;;
         6)
-            docker logs -f happyheadlines-rabbitmq
+            docker logs -f newsletter-service
             ;;
         7)
+            docker logs -f webapp-service
+            ;;
+        8)
+            docker logs -f happyheadlines-rabbitmq
+            ;;
+        9)
             docker-compose -f infra/observability/docker-compose.yml logs -f &
             docker-compose -f infra/messaging/docker-compose.yml logs -f &
             docker-compose -f apps/draft-service/docker-compose.yml logs -f &
+            docker-compose -f apps/profanity-service/docker-compose.yml logs -f &
+            docker-compose -f apps/comment-service/docker-compose.yml logs -f &
             docker-compose -f apps/publisher-service/docker-compose.yml logs -f &
             docker-compose -f apps/article-service/docker-compose.yaml logs -f &
             docker-compose -f apps/newsletter-service/docker-compose.yml logs -f &
@@ -510,6 +569,8 @@ show_access_info() {
     echo "   PublisherService:      http://localhost:5300"
     echo "   ArticleService:        http://localhost:80"
     echo "   NewsletterService:     http://localhost:5400"
+    echo "   CommentService:        http://localhost:5542"
+    echo "   ProfanityService:      http://localhost:5100"
     echo ""
     echo "🔧 Infrastructure:"
     echo "   RabbitMQ Management:   http://localhost:15672 (admin/admin)"
