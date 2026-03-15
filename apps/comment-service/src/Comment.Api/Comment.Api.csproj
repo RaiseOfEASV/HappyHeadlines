@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.3" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
     <!--
       Design package stays here so `dotnet ef` CLI works with this as the startup project.
       PrivateAssets=all ensures it is never published into the Docker image.

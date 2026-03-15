@@ -1,6 +1,7 @@
 using Comment.Data;
 using Comment.Services;
 using Options;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -18,5 +19,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapMetrics();
 app.UseHttpsRedirection();
 app.Run();
