@@ -2,21 +2,30 @@
 using Domain.valueobjects;
 using models.articles;
 using models.continents;
+using Prometheus;
 
 namespace Article.Services.application_services;
 
 public class ArticleService(IArticleRepository articleRepository,IContinentContext continentContext,ICacheService cacheService) : IArticleService
 {
+    private static readonly Counter CacheHits = Metrics.CreateCounter(
+        "article_cache_hits_total", "Number of article cache hits");
+
+    private static readonly Counter CacheMisses = Metrics.CreateCounter(
+        "article_cache_misses_total", "Number of article cache misses");
+
     public async Task<IEnumerable<ArticleDto>> GetAllArticlesAsync(Continent continent)
     {
         continentContext.Continent = continent;
         if (continent == Continent.Global)
         {
             var cachedArticles = await cacheService.GetAsync<ArticleDto[]>($"recentArticles:{Continent.Global}");
-            if (cachedArticles!=null)
+            if (cachedArticles != null)
             {
+                CacheHits.Inc();
                 return cachedArticles;
             }
+            CacheMisses.Inc();
         }
         var articles = await articleRepository.GetAllAsync();
         return articles.Select(ToDto);
