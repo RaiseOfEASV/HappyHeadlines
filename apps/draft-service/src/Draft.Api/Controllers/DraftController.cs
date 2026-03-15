@@ -27,6 +27,16 @@ public class DraftController(IDraftService draftService) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateDraftRequest request)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (request.AuthorId == Guid.Empty)
+        {
+            return BadRequest(new { error = "AuthorId must be a valid non-empty GUID" });
+        }
+
         var draft = await draftService.CreateAsync(request.Title, request.Content, request.AuthorId);
         return Created($"/{draft.Id}", draft);
     }
@@ -34,6 +44,11 @@ public class DraftController(IDraftService draftService) : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDraftRequest request)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         var draft = await draftService.UpdateAsync(id, request.Title, request.Content);
         if (draft is null)
             return NotFound();
