@@ -1,11 +1,9 @@
-# Docker Compose file for webapp-service
-
 services:
-  webapp-service:
+  publisher-webapp:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: webapp-service
+    container_name: publisher-webapp
     ports:
       - "3000:80"
     environment:

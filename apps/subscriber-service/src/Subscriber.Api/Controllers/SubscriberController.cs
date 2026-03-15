@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using Newsletter.Services.DTOs;
-using Newsletter.Services.Services;
+using Subscriber.Services.DTOs;
+using Subscriber.Services.Services;
 
-namespace Newsletter.Api.Controllers;
+namespace Subscriber.Api.Controllers;
 
 [ApiController]
-[Route("api/newsletter/subscriber")]
+[Route("api/subscriber")]
 public class SubscriberController : ControllerBase
 {
     private readonly ISubscriberService _subscriberService;

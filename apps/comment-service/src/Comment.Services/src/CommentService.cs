@@ -61,6 +61,7 @@ public class CommentService(CommentDbContext db,IMessageClient messageClient, IP
 
         db.Comments.Add(entity);
         await db.SaveChangesAsync();
+        await commentsCacheService.InvalidateArticleAsync(entity.ArticleId);
 
         return new CommentDto(entity.CommentId, entity.ArticleId, entity.AuthorId, entity.Content, entity.CreatedAt);
     }
@@ -72,5 +73,6 @@ public class CommentService(CommentDbContext db,IMessageClient messageClient, IP
 
         db.Comments.Remove(entity);
         await db.SaveChangesAsync();
+        await commentsCacheService.InvalidateArticleAsync(entity.ArticleId);
     }
 }

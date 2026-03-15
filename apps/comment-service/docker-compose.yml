@@ -23,6 +23,9 @@ services:
       - ./nginx/:/etc/nginx/conf.d/
     depends_on:
       - comment-api-1
+    networks:
+      - default
+      - services
   # ── PostgreSQL ──────────────────────────────────────────────────────────────
   comment-db:
     image: postgres:17-alpine

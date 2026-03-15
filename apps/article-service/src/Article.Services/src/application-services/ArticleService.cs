@@ -24,8 +24,14 @@ public class ArticleService(IArticleRepository articleRepository,IContinentConte
 
     public async Task<ArticleDto?> GetArticleByIdAsync(Guid id)
     {
-        var article = await articleRepository.GetByIdAsync(id);
-        return article is null ? null : ToDto(article);
+        foreach (var continent in Enum.GetValues<Continent>())
+        {
+            continentContext.Continent = continent;
+            var article = await articleRepository.GetByIdAsync(id);
+            if (article is not null)
+                return ToDto(article);
+        }
+        return null;
     }
 
     public async Task<ArticleDto> CreateArticleAsync(CreateArticleDto createArticleDto)
