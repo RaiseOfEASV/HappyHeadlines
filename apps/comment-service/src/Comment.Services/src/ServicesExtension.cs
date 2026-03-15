@@ -8,6 +8,8 @@ public static class ServicesExtension
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        // Singleton because LRU state must be shared across all requests
+        services.AddSingleton<ICommentCacheService, CommentCacheService>();
         services.AddScoped<ICommentService, CommentService>();
 
         services.AddHttpClient<IProfanityClient, ProfanityClient>((sp, client) =>
