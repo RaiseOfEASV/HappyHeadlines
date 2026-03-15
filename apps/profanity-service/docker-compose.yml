@@ -58,11 +58,15 @@ services:
     networks:
       - default
       - observability
+      - messaging
 
 networks:
   observability:
     external: true
     name: happyheadlines-observability
+  messaging:
+    external: true
+    name: happyheadlines-messaging
 
 volumes:
   profanity-db-data:
