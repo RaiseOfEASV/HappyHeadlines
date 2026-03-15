@@ -44,6 +44,8 @@ services:
       dockerfile: apps/draft-service/Dockerfile
     container_name: draft-service
     env_file: .env
+    ports:
+      - "8080:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       AppInfrastructureOptions__DbConnectionString: "Host=draft-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
