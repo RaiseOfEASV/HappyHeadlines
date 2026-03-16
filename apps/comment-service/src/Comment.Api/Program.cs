@@ -29,6 +29,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseServiceLogging();
+app.MapPrometheusScrapingEndpoint(); 
 app.MapControllers();
 app.UseHttpsRedirection();
 app.Run();

@@ -27,7 +27,7 @@ public static class InfrastructureServiceExtensions
         services.AddSingleton<IConnectionMultiplexer>(sp =>
             ConnectionMultiplexer.Connect(configuration["Redis:ConnectionString"]!));
 
-        services.AddScoped<ICacheService, RedisCacheService>();
+        services.AddSingleton<ICacheService, RedisCacheService>();
 
         return services;
     }

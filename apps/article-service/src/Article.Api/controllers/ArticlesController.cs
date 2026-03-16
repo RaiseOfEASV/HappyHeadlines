@@ -17,9 +17,9 @@ public class ArticlesController(IArticleService articleService) : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id, [FromQuery] Continent continent = Continent.Global)
     {
-        var article = await articleService.GetArticleByIdAsync(id);
+        var article = await articleService.GetArticleByIdAsync(id, continent);
         if (article is null)
             return NotFound();
         return Ok(article);

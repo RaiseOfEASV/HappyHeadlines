@@ -41,6 +41,7 @@ networks:
     driver: bridge
     labels:
       com.docker.compose.project: "messaging"
+      
 
 volumes:
   rabbitmq-data:
