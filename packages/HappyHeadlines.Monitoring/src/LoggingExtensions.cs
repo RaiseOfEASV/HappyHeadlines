@@ -46,6 +46,8 @@ public static class LoggingExtensions
             };
         });
 
+        app.MapPrometheusScrapingEndpoint("/metrics");
+
         return app;
     }
 }

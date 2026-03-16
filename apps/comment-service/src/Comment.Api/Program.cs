@@ -1,10 +1,15 @@
 using Comment.Data;
 using Comment.Services;
+using HappyHeadlines.Monitoring;
 using MessageClient.Configuration;
 using MessageClient.Extension;
 using Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceLogging("comment-service");
+builder.AddServiceTracing("comment-service");
+
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAppOptions(builder.Configuration);
@@ -23,6 +28,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseServiceLogging();
 app.MapControllers();
 app.UseHttpsRedirection();
 app.Run();

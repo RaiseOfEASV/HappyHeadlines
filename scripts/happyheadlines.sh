@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Project root directory (parent of scripts/)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # ==========================================
 # Utility Functions
@@ -166,14 +166,20 @@ check_requirements() {
 
     if command_exists nc; then
         declare -A REQUIRED_PORTS=(
-            [80]="ArticleService"
             [3000]="webapp-service"
+            [3001]="website"
+            [5100]="ProfanityService"
+            [5200]="ArticleService"
             [5300]="PublisherService"
             [5341]="Seq"
             [5400]="NewsletterService"
+            [5500]="SubscriberService"
+            [5542]="CommentService"
             [5672]="RabbitMQ"
             [8080]="DraftService"
             [15672]="RabbitMQ Management"
+            [9090]="Prometheus"
+            [3003]="Grafana"
             [16686]="Jaeger"
         )
 
@@ -216,6 +222,13 @@ start_services() {
     docker stop draft-frontend 2>/dev/null || true
     docker rm draft-frontend 2>/dev/null || true
 
+    # Clean up stale database containers that might be in 'Created' state
+    for container in comment-db profanity-db draft-db publisher-db newsletter-db subscriber-db; do
+        if docker ps -a --filter "name=$container" --filter "status=created" --format "{{.Names}}" | grep -q "$container"; then
+            docker rm "$container" 2>/dev/null || true
+        fi
+    done
+
     print_info "Starting infrastructure services..."
 
     # Start Observability
@@ -230,7 +243,7 @@ start_services() {
 
     sleep 3
 
-    # Start RabbitMQ
+    # Start RabbitMQ (before metrics so services network exists when metrics starts)
     print_info "Starting RabbitMQ..."
     cd infra/messaging
     if ! docker-compose up -d; then
@@ -270,6 +283,32 @@ start_services() {
 
     sleep 3
 
+    # Start ProfanityService
+    print_info "Starting ProfanityService..."
+    cd apps/profanity-service
+    if ! docker-compose up --build -d; then
+        print_error "Failed to start ProfanityService"
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+    cd "$SCRIPT_DIR"
+    print_success "ProfanityService started"
+
+    sleep 3
+
+    # Start CommentService
+    print_info "Starting CommentService..."
+    cd apps/comment-service
+    if ! docker-compose up --build -d; then
+        print_error "Failed to start CommentService"
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+    cd "$SCRIPT_DIR"
+    print_success "CommentService started"
+
+    sleep 3
+
     # Start PublisherService
     print_info "Starting PublisherService..."
     cd apps/publisher-service
@@ -296,16 +335,53 @@ start_services() {
 
     sleep 3
 
-    # Start webapp-service
-    print_info "Starting webapp-service..."
-    cd apps/webapp-service
+    # Start SubscriberService
+    print_info "Starting SubscriberService..."
+    cd apps/subscriber-service
     if ! docker-compose up --build -d; then
-        print_error "Failed to start webapp-service"
+        print_error "Failed to start SubscriberService"
         cd "$SCRIPT_DIR"
         return 1
     fi
     cd "$SCRIPT_DIR"
-    print_success "webapp-service started"
+    print_success "SubscriberService started"
+
+    sleep 3
+
+    # Start publisher-webapp
+    print_info "Starting publisher-webapp..."
+    cd apps/publisher-webapp
+    if ! docker-compose up --build -d; then
+        print_error "Failed to start publisher-webapp"
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+    cd "$SCRIPT_DIR"
+    print_success "publisher-webapp started"
+
+    sleep 3
+
+    # Start website
+    print_info "Starting subscriber-webapp..."
+    cd apps/subscriber-webapp
+    if ! docker-compose up --build -d; then
+        print_error "Failed to start subscriber-webapp"
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+    cd "$SCRIPT_DIR"
+    print_success "subscriber-webapp started"
+
+    # Start Metrics (Prometheus + Grafana) — after services are up so the network exists
+    print_info "Starting Prometheus + Grafana..."
+    cd infra/metrics
+    if ! docker-compose up -d; then
+        print_error "Failed to start metrics services"
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+    cd "$SCRIPT_DIR"
+    print_success "Metrics started"
 
     print_header "Services Started Successfully!"
 
@@ -328,10 +404,20 @@ stop_services() {
 
     print_info "Stopping application services..."
 
-    cd apps/webapp-service
+    cd apps/subscriber-webapp
     docker-compose down
     cd "$SCRIPT_DIR"
-    print_success "webapp-service stopped"
+    print_success "subscriber-webapp stopped"
+
+    cd apps/publisher-webapp
+    docker-compose down
+    cd "$SCRIPT_DIR"
+    print_success "publisher-webapp stopped"
+
+    cd apps/subscriber-service
+    docker-compose down
+    cd "$SCRIPT_DIR"
+    print_success "SubscriberService stopped"
 
     cd apps/newsletter-service
     docker-compose down
@@ -348,12 +434,27 @@ stop_services() {
     cd "$SCRIPT_DIR"
     print_success "DraftService stopped"
 
+    cd apps/comment-service
+    docker-compose down
+    cd "$SCRIPT_DIR"
+    print_success "CommentService stopped"
+
+    cd apps/profanity-service
+    docker-compose down
+    cd "$SCRIPT_DIR"
+    print_success "ProfanityService stopped"
+
     cd apps/article-service
     docker-compose down
     cd "$SCRIPT_DIR"
     print_success "ArticleService stopped"
 
     print_info "Stopping infrastructure services..."
+
+    cd infra/metrics
+    docker-compose down
+    cd "$SCRIPT_DIR"
+    print_success "Metrics stopped"
 
     cd infra/messaging
     docker-compose down
@@ -388,25 +489,38 @@ check_status() {
     check_container "seq" "Seq (Logs)"
     check_container "jaeger" "Jaeger (Tracing)"
     check_container "happyheadlines-rabbitmq" "RabbitMQ"
+    check_container "prometheus" "Prometheus"
+    check_container "grafana" "Grafana"
 
     print_header "Application Services"
     check_container "draft-service" "DraftService"
+    check_container "profanity-api" "ProfanityService"
+    check_container "comment-api-1" "CommentService"
     check_container "publisher-service" "PublisherService"
     check_container "newsletter-service" "NewsletterService"
-    check_container "webapp-service" "webapp-service"
+    check_container "subscriber-service" "SubscriberService"
+    check_container "publisher-webapp" "publisher-webapp"
+    check_container "subscriber-webapp" "subscriber-webapp"
     check_container "articles-api-1" "ArticleService"
 
     print_header "Database Services"
     check_container "draft-db" "DraftService DB"
+    check_container "profanity-db" "ProfanityService DB"
+    check_container "comment-db" "CommentService DB"
     check_container "publisher-db" "PublisherService DB"
     check_container "newsletter-db" "NewsletterService DB"
+    check_container "subscriber-db" "SubscriberService DB"
     check_container "article-db" "ArticleService DB"
 
     print_header "HTTP Health Checks"
     check_service_http "http://localhost:5341" "Seq"
     check_service_http "http://localhost:16686" "Jaeger"
     check_service_http "http://localhost:15672" "RabbitMQ Management"
-    check_service_http "http://localhost:3000" "webapp-service"
+    check_service_http "http://localhost:9090" "Prometheus"
+    check_service_http "http://localhost:3003" "Grafana"
+    check_service_http "http://localhost:3000" "publisher-webapp"
+    check_service_http "http://localhost:3001" "subscriber-webapp"
+    check_service_http "http://localhost:5500" "SubscriberService"
 
     print_header "Summary"
     TOTAL_CONTAINERS=$(docker ps -q | wc -l)
@@ -424,43 +538,63 @@ show_logs() {
     echo "Select a service to view logs:"
     echo ""
     echo "  1) DraftService"
-    echo "  2) PublisherService"
-    echo "  3) ArticleService"
-    echo "  4) NewsletterService"
-    echo "  5) webapp-service"
-    echo "  6) RabbitMQ"
-    echo "  7) All services"
+    echo "  2) ProfanityService"
+    echo "  3) CommentService"
+    echo "  4) PublisherService"
+    echo "  5) ArticleService"
+    echo "  6) NewsletterService"
+    echo "  7) SubscriberService"
+    echo "  8) publisher-webapp"
+    echo "  9) subscriber-webapp"
+    echo "  r) RabbitMQ"
+    echo "  a) All services"
     echo "  0) Cancel"
     echo ""
-    read -p "Enter choice [0-7]: " choice
+    read -p "Enter choice [0-9/r/a]: " choice
 
     case $choice in
         1)
             docker logs -f draft-service
             ;;
         2)
-            docker logs -f publisher-service
+            docker logs -f profanity-api
             ;;
         3)
-            docker logs -f articles-api-1
+            docker logs -f comment-api-1
             ;;
         4)
-            docker logs -f newsletter-service
+            docker logs -f publisher-service
             ;;
         5)
-            docker logs -f webapp-service
+            docker logs -f articles-api-1
             ;;
         6)
-            docker logs -f happyheadlines-rabbitmq
+            docker logs -f newsletter-service
             ;;
         7)
+            docker logs -f subscriber-service
+            ;;
+        8)
+            docker logs -f publisher-webapp
+            ;;
+        9)
+            docker logs -f subscriber-webapp
+            ;;
+        r)
+            docker logs -f happyheadlines-rabbitmq
+            ;;
+        a)
             docker-compose -f infra/observability/docker-compose.yml logs -f &
             docker-compose -f infra/messaging/docker-compose.yml logs -f &
             docker-compose -f apps/draft-service/docker-compose.yml logs -f &
+            docker-compose -f apps/profanity-service/docker-compose.yml logs -f &
+            docker-compose -f apps/comment-service/docker-compose.yml logs -f &
             docker-compose -f apps/publisher-service/docker-compose.yml logs -f &
             docker-compose -f apps/article-service/docker-compose.yaml logs -f &
             docker-compose -f apps/newsletter-service/docker-compose.yml logs -f &
-            docker-compose -f apps/webapp-service/docker-compose.yml logs -f
+            docker-compose -f apps/subscriber-service/docker-compose.yml logs -f &
+            docker-compose -f apps/publisher-webapp/docker-compose.yml logs -f &
+            docker-compose -f apps/subscriber-webapp/docker-compose.yml logs -f
             ;;
         0)
             echo "Cancelled"
@@ -502,19 +636,25 @@ clean_all() {
 show_access_info() {
     echo -e "${GREEN}=== Access Points ===${NC}"
     echo ""
-    echo "🌐 Web Application:"
-    echo "   webapp-service:        http://localhost:3000"
+    echo "🌐 Web Applications:"
+    echo "   publisher-webapp:      http://localhost:3000  (Publisher)"
+    echo "   subscriber-webapp:     http://localhost:3001  (Reader)"
     echo ""
     echo "📡 API Services:"
     echo "   DraftService:          http://localhost:8080"
     echo "   PublisherService:      http://localhost:5300"
-    echo "   ArticleService:        http://localhost:80"
+    echo "   ArticleService:        http://localhost:5200"
     echo "   NewsletterService:     http://localhost:5400"
+    echo "   SubscriberService:     http://localhost:5500"
+    echo "   CommentService:        http://localhost:5542"
+    echo "   ProfanityService:      http://localhost:5100"
     echo ""
     echo "🔧 Infrastructure:"
     echo "   RabbitMQ Management:   http://localhost:15672 (admin/admin)"
     echo "   Seq (Logs):            http://localhost:5341"
     echo "   Jaeger (Traces):       http://localhost:16686"
+    echo "   Prometheus:            http://localhost:9090"
+    echo "   Grafana (Metrics):     http://localhost:3003 (admin/admin)"
     echo ""
 }
 

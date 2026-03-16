@@ -32,6 +32,13 @@ public class ArticlesController(IArticleService articleService) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.ArticleId }, created);
     }
 
+    [HttpPost("{continent}")]
+    public async Task<IActionResult> CreateForContinent(Continent continent, [FromBody] CreateArticleDto createArticleDto)
+    {
+        var created = await articleService.CreateArticleAsync(createArticleDto, continent);
+        return CreatedAtAction(nameof(GetById), new { id = created.ArticleId }, created);
+    }
+
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateArticleDto updateArticleDto)
     {

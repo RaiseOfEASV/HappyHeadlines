@@ -24,5 +24,6 @@
     <ProjectReference Include="..\Options\Options.csproj" />
     <ProjectReference Include="..\Handlers\Handlers.csproj" />
     <ProjectReference Include="..\..\..\..\packages\MessageClient\MessageClient.csproj" />
+    <ProjectReference Include="../../../../packages/HappyHeadlines.Monitoring/src/HappyHeadlines.Monitoring.csproj" />
   </ItemGroup>
 </Project>

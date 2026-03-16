@@ -36,8 +36,9 @@ public static class ServicesExtension
     {
         services.AddMassTransit(x =>
         {
-            // Register consumer
+            // Register consumers
             x.AddConsumer<ArticlePublishedConsumer>();
+            x.AddConsumer<NewSubscriberConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {
@@ -53,6 +54,15 @@ public static class ServicesExtension
                 cfg.ReceiveEndpoint("newsletter.article.published", e =>
                 {
                     e.ConfigureConsumer<ArticlePublishedConsumer>(context);
+
+                    // Retry configuration
+                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+                });
+
+                // Configure endpoint for NewSubscriberEvent
+                cfg.ReceiveEndpoint("newsletter.subscriber.new", e =>
+                {
+                    e.ConfigureConsumer<NewSubscriberConsumer>(context);
 
                     // Retry configuration
                     e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));

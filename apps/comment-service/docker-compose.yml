@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
@@ -12,17 +12,20 @@ services:
   redisinsight:
     image: redis/redisinsight:latest
     ports:
-      - "5540:5540"
+      - "5541:5540"
     depends_on:
       - redis 
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"
+      - "5542:80"
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
     depends_on:
       - comment-api-1
+    networks:
+      - default
+      - services
   # ── PostgreSQL ──────────────────────────────────────────────────────────────
   comment-db:
     image: postgres:17-alpine
@@ -33,7 +36,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5434:5432"          # host 5434 → container 5432 (avoids conflict with other DBs)
+      - "5435:5432"          # host 5435 → container 5432 (avoids conflict with other DBs)
     volumes:
       - comment-db-data:/var/lib/postgresql/data
     healthcheck:
@@ -72,14 +75,19 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       AppInfrastructureOptions__DbConnectionString: "Host=comment-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
-      AppInfrastructureOptions__ProfanityServiceUrl: "http://host.docker.internal:5100"
+      AppInfrastructureOptions__ProfanityServiceUrl: "http://profanity-api:8080"
       Redis__ConnectionString: ${Redis__ConnectionString}
+      Seq__ServerUrl: "http://seq:80"
+      Seq__ApiKey: ${SEQ_API_KEY}
+      Otlp__Endpoint: "http://jaeger:4317"
     depends_on:
       comment-flyway:
         condition: service_completed_successfully
     networks:
       - default
       - messaging
+      - services
+      - observability
   comment-api-2:
     <<: *api
 
@@ -87,6 +95,12 @@ networks:
   messaging:
     external: true
     name: happyheadlines-messaging
+  services:
+    external: true
+    name: happyheadlines-services
+  observability:
+    external: true
+    name: happyheadlines-observability
 
 volumes:
   comment-db-data:

@@ -1,0 +1,19 @@
+services:
+  subscriber-webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: subscriber-webapp
+    ports:
+      - "3001:80"
+    networks:
+      - services
+      - observability
+
+networks:
+  services:
+    external: true
+    name: happyheadlines-services
+  observability:
+    external: true
+    name: happyheadlines-observability

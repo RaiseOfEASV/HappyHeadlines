@@ -12,8 +12,9 @@ COPY apps/comment-service/src/Options/Options.csproj                 apps/commen
 COPY apps/comment-service/src/Handlers/Handlers.csproj               apps/comment-service/src/Handlers/
 
 # Copy shared package csproj files
-COPY packages/MessageClient/MessageClient.csproj                     packages/MessageClient/
-COPY packages/SharedContracts/SharedContracts.csproj                 packages/SharedContracts/
+COPY packages/MessageClient/MessageClient.csproj                                         packages/MessageClient/
+COPY packages/SharedContracts/SharedContracts.csproj                                     packages/SharedContracts/
+COPY packages/HappyHeadlines.Monitoring/src/HappyHeadlines.Monitoring.csproj             packages/HappyHeadlines.Monitoring/src/
 
 RUN dotnet restore apps/comment-service/CommentService.sln
 
@@ -21,6 +22,7 @@ RUN dotnet restore apps/comment-service/CommentService.sln
 COPY apps/comment-service/src/ apps/comment-service/src/
 COPY packages/MessageClient/   packages/MessageClient/
 COPY packages/SharedContracts/ packages/SharedContracts/
+COPY packages/HappyHeadlines.Monitoring/src/ packages/HappyHeadlines.Monitoring/src/
 
 RUN dotnet publish apps/comment-service/src/Comment.Api/Comment.Api.csproj \
     -c Release \

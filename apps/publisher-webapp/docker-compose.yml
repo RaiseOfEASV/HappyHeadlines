@@ -1,0 +1,23 @@
+services:
+  publisher-webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: publisher-webapp
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_DRAFT_SERVICE_URL=http://draft-service:8080
+      - VITE_PUBLISHER_SERVICE_URL=http://publisher-service:8080
+      - VITE_JAEGER_ENDPOINT=http://jaeger:4318/v1/traces
+    networks:
+      - services
+      - observability
+
+networks:
+  services:
+    external: true
+    name: happyheadlines-services
+  observability:
+    external: true
+    name: happyheadlines-observability

@@ -15,7 +15,7 @@
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: rabbitmq
+    container_name: happyheadlines-rabbitmq
     env_file: .env
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
@@ -39,6 +39,8 @@ networks:
   messaging:
     name: happyheadlines-messaging
     driver: bridge
+    labels:
+      com.docker.compose.project: "messaging"
 
 volumes:
   rabbitmq-data:

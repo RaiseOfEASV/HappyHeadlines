@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -24,6 +25,15 @@ public static class TracingExtensions
                 var endpoint = builder.Configuration["Otlp:Endpoint"];
                 if (!string.IsNullOrEmpty(endpoint))
                     tracing.AddOtlpExporter(o => o.Endpoint = new Uri(endpoint));
+            })
+            .WithMetrics(metrics =>
+            {
+                metrics
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddRuntimeInstrumentation()
+                    .AddMeter("happyheadlines.*")
+                    .AddPrometheusExporter();
             });
 
         return builder;

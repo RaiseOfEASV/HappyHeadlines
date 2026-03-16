@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5436:5432"          # host 5436 → container 5432 (avoids conflict with other DBs)
+      - "5437:5432"          # host 5437 → container 5432 (avoids conflict with other DBs)
     volumes:
       - newsletter-db-data:/var/lib/postgresql/data
     healthcheck:
@@ -27,7 +27,7 @@ services:
     command: redis-server --requirepass ${REDIS_PASSWORD}
     env_file: .env
     ports:
-      - "6380:6379"          # host 6380 → container 6379
+      - "6381:6379"          # host 6381 → container 6379
     volumes:
       - newsletter-redis-data:/data
     healthcheck:
@@ -64,7 +64,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       AppInfrastructureOptions__DbConnectionString: "Host=newsletter-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       AppInfrastructureOptions__RedisConnectionString: "newsletter-redis:6379,password=${REDIS_PASSWORD}"
-      AppInfrastructureOptions__ArticleServiceUrl: "http://article-service:8080"
+      AppInfrastructureOptions__ArticleServiceUrl: "http://article-service-nginx-1:80"
       AppInfrastructureOptions__RabbitMq__Host: "happyheadlines-rabbitmq"
       AppInfrastructureOptions__RabbitMq__Port: "5672"
       AppInfrastructureOptions__RabbitMq__Username: ${RABBITMQ_USER}
@@ -87,6 +87,7 @@ services:
       - default
       - observability
       - messaging
+      - services
 
 networks:
   observability:
@@ -95,6 +96,9 @@ networks:
   messaging:
     external: true
     name: happyheadlines-messaging
+  services:
+    external: true
+    name: happyheadlines-services
 
 volumes:
   newsletter-db-data:

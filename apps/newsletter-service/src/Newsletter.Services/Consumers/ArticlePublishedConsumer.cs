@@ -1,6 +1,6 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Newsletter.Services.Messages;
+using HappyHeadlines.Contracts;
 using Newsletter.Services.Services;
 
 namespace Newsletter.Services.Consumers;
