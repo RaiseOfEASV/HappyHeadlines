@@ -178,6 +178,8 @@ check_requirements() {
             [5672]="RabbitMQ"
             [8080]="DraftService"
             [15672]="RabbitMQ Management"
+            [9090]="Prometheus"
+            [3003]="Grafana"
             [16686]="Jaeger"
         )
 
@@ -241,7 +243,7 @@ start_services() {
 
     sleep 3
 
-    # Start RabbitMQ
+    # Start RabbitMQ (before metrics so services network exists when metrics starts)
     print_info "Starting RabbitMQ..."
     cd infra/messaging
     if ! docker-compose up -d; then
@@ -370,6 +372,17 @@ start_services() {
     cd "$SCRIPT_DIR"
     print_success "subscriber-webapp started"
 
+    # Start Metrics (Prometheus + Grafana) — after services are up so the network exists
+    print_info "Starting Prometheus + Grafana..."
+    cd infra/metrics
+    if ! docker-compose up -d; then
+        print_error "Failed to start metrics services"
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+    cd "$SCRIPT_DIR"
+    print_success "Metrics started"
+
     print_header "Services Started Successfully!"
 
     print_info "Waiting for services to be ready (15 seconds)..."
@@ -438,6 +451,11 @@ stop_services() {
 
     print_info "Stopping infrastructure services..."
 
+    cd infra/metrics
+    docker-compose down
+    cd "$SCRIPT_DIR"
+    print_success "Metrics stopped"
+
     cd infra/messaging
     docker-compose down
     cd "$SCRIPT_DIR"
@@ -471,6 +489,8 @@ check_status() {
     check_container "seq" "Seq (Logs)"
     check_container "jaeger" "Jaeger (Tracing)"
     check_container "happyheadlines-rabbitmq" "RabbitMQ"
+    check_container "prometheus" "Prometheus"
+    check_container "grafana" "Grafana"
 
     print_header "Application Services"
     check_container "draft-service" "DraftService"
@@ -496,6 +516,8 @@ check_status() {
     check_service_http "http://localhost:5341" "Seq"
     check_service_http "http://localhost:16686" "Jaeger"
     check_service_http "http://localhost:15672" "RabbitMQ Management"
+    check_service_http "http://localhost:9090" "Prometheus"
+    check_service_http "http://localhost:3003" "Grafana"
     check_service_http "http://localhost:3000" "publisher-webapp"
     check_service_http "http://localhost:3001" "subscriber-webapp"
     check_service_http "http://localhost:5500" "SubscriberService"
@@ -631,6 +653,8 @@ show_access_info() {
     echo "   RabbitMQ Management:   http://localhost:15672 (admin/admin)"
     echo "   Seq (Logs):            http://localhost:5341"
     echo "   Jaeger (Traces):       http://localhost:16686"
+    echo "   Prometheus:            http://localhost:9090"
+    echo "   Grafana (Metrics):     http://localhost:3003 (admin/admin)"
     echo ""
 }
 
