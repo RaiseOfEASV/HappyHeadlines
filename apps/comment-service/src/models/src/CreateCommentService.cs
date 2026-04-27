@@ -1,8 +1,9 @@
 ﻿using Comment.Data.configuration;
 using Comment.Data.entities;
-using Comment.Services;
 using MessageClient.Interfaces;
 using SharedContracts.contracts;
+
+namespace models;
 
 public class CreateCommentWithProfanity : ICreateCommentStrategy
 {

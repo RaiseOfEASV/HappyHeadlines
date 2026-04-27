@@ -1,13 +1,15 @@
 using Comment.Data.configuration;
 using Comment.Data.entities;
+using Feature.Flags;
 using MessageClient.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using models;
 using SharedContracts.contracts;
 
 namespace Comment.Services;
 
-public class CommentService(CommentDbContext db,IMessageClient messageClient, IProfanityClient profanityClient, ILogger<CommentService> logger,CommentsCacheService commentsCacheService) : ICommentService
+public class CommentService(FeatureRouter featurerouter,CommentDbContext db,IMessageClient messageClient, IProfanityClient profanityClient, ILogger<CommentService> logger,CommentsCacheService commentsCacheService) : ICommentService
 {
     public async Task<IEnumerable<CommentDto>> GetByArticleAsync(Guid articleId)
     {
@@ -29,41 +31,11 @@ public class CommentService(CommentDbContext db,IMessageClient messageClient, IP
     }
 
 
-    public async Task<CommentDto> CreateAsync(CreateCommentDto dto)
+    public async Task<CommentDto> CreateAsync(CreateCommentDto dto,ConfigProfanity flags)
     {
-
-        
- 
-        
-        string filteredContent;
-  
-        try
-        {
-            filteredContent = await profanityClient.FilterAsync(dto.Content);
-        }
-        catch (Exception ex)
-        {
-            // Circuit breaker is open or ProfanityService is unavailable — swimlane isolation:
-            // save the comment without filtering rather than failing the entire request.
-            logger.LogWarning(ex, "ProfanityService unavailable — saving comment without profanity filtering.");
-            filteredContent = dto.Content;
-        }
-        var entity = new CommentEntity
-        {
-            CommentId = Guid.NewGuid(),
-            ArticleId = dto.ArticleId,
-            AuthorId = dto.AuthorId,
-            Content = filteredContent,
-            CreatedAt = DateTime.UtcNow,
-        };
-        var commentCreated = new CommentCreatedEvent(entity.CommentId,dto.Content);
-        messageClient.PublishAsync<CommentCreatedEvent>(commentCreated);
-
-        db.Comments.Add(entity);
-        await db.SaveChangesAsync();
-        await commentsCacheService.InvalidateArticleAsync(entity.ArticleId);
-
-        return new CommentDto(entity.CommentId, entity.ArticleId, entity.AuthorId, entity.Content, entity.CreatedAt);
+    
+    var response = await featurerouter.CreateComment(dto,flags);
+    return response;
     }
 
     public async Task DeleteAsync(Guid commentId)

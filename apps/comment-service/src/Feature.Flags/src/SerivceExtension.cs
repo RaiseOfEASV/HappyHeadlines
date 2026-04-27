@@ -1,6 +1,15 @@
-﻿namespace feature_flags;
+﻿using Microsoft.Extensions.DependencyInjection;
+using models;
 
-public class SerivceExtension
+namespace Feature.Flags;
+
+public static class ServiceExtension
 {
-    
+    public static IServiceCollection AddFeatureFlags(this IServiceCollection services)
+    {
+        services.AddScoped<CreateCommentWithProfanity>();
+        services.AddScoped<CreateCommentWithoutProfanity>();
+        services.AddScoped<FeatureRouter>();
+        return services;
+    }
 }

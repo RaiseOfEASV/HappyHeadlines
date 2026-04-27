@@ -1,4 +1,4 @@
-﻿using Comment.Services;
+﻿namespace models;
 
 public interface ICreateCommentStrategy
 {

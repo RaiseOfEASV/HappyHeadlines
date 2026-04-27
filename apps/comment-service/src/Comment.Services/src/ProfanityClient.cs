@@ -4,6 +4,7 @@ using Polly;
 using Polly.CircuitBreaker;
 using Polly.Timeout;
 
+
 namespace Comment.Services;
 
 public class ProfanityClient : IProfanityClient

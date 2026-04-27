@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedContracts", "..\..\pa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageClient", "..\..\packages\MessageClient\MessageClient.csproj", "{02D9BC45-04A2-41E3-90B0-E88A5930DEAC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "models", "src\models\models.csproj", "{73469AB3-ED95-43B4-B819-124FF3A27E5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Feature.Flags", "src\Feature.Flags\Feature.Flags.csproj", "{14EF0070-E4F2-4205-8A33-C22DA71B4303}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +63,14 @@ Global
 		{02D9BC45-04A2-41E3-90B0-E88A5930DEAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02D9BC45-04A2-41E3-90B0-E88A5930DEAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02D9BC45-04A2-41E3-90B0-E88A5930DEAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73469AB3-ED95-43B4-B819-124FF3A27E5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73469AB3-ED95-43B4-B819-124FF3A27E5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73469AB3-ED95-43B4-B819-124FF3A27E5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73469AB3-ED95-43B4-B819-124FF3A27E5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14EF0070-E4F2-4205-8A33-C22DA71B4303}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14EF0070-E4F2-4205-8A33-C22DA71B4303}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14EF0070-E4F2-4205-8A33-C22DA71B4303}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14EF0070-E4F2-4205-8A33-C22DA71B4303}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
