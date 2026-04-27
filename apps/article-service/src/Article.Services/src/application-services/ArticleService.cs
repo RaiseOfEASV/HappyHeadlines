@@ -10,28 +10,29 @@ public class ArticleService(IArticleRepository articleRepository,IContinentConte
     public async Task<IEnumerable<ArticleDto>> GetAllArticlesAsync(Continent continent)
     {
         continentContext.Continent = continent;
-        if (continent == Continent.Global)
-        {
-            var cachedArticles = await cacheService.GetAsync<ArticleDto[]>($"recentArticles:{Continent.Global}");
+            var cachedArticles = await cacheService.GetAsync<ArticleDto[]>($"recentArticles:{continent}");
             if (cachedArticles!=null)
             {
                 return cachedArticles;
             }
-        }
         var articles = await articleRepository.GetAllAsync();
         return articles.Select(ToDto);
     }
 
-    public async Task<ArticleDto?> GetArticleByIdAsync(Guid id)
+    public async Task<ArticleDto?> GetArticleByIdAsync(Guid id, Continent continent)
     {
-        foreach (var continent in Enum.GetValues<Continent>())
-        {
-            continentContext.Continent = continent;
-            var article = await articleRepository.GetByIdAsync(id);
-            if (article is not null)
-                return ToDto(article);
-        }
-        return null;
+        continentContext.Continent = continent;
+        var cached = await cacheService.GetAsync<ArticleDto>($"article:{id}");
+        if (cached != null)
+            return cached;
+
+        var article = await articleRepository.GetByIdAsync(id);
+        if (article is null)
+            return null;
+
+        var dto = ToDto(article);
+        await cacheService.SetAsync($"article:{id}", dto);
+        return dto;
     }
 
     public async Task<ArticleDto> CreateArticleAsync(CreateArticleDto createArticleDto, Continent continent = Continent.Global)

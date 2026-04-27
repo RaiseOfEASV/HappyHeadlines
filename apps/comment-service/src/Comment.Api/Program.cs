@@ -1,5 +1,6 @@
 using Comment.Data;
 using Comment.Services;
+using Feature.Flags;
 using HappyHeadlines.Monitoring;
 using MessageClient.Configuration;
 using MessageClient.Extension;
@@ -15,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAppOptions(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddDataSourceAndRepositories(builder.Configuration);
+builder.Services.AddFeatureFlags();
 builder.Services.AddRabbitMqMessageClient(
     new RabbitMqClientOptions { ConnectionString = "host=rabbitmq" }, 
     new MessageHandlerOptions { SubscriptionPrefix = "comment"}
@@ -29,6 +31,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseServiceLogging();
+app.MapPrometheusScrapingEndpoint(); 
 app.MapControllers();
 app.UseHttpsRedirection();
 app.Run();

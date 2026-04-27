@@ -1,4 +1,6 @@
-namespace Comment.Services;
+
+
+namespace models;
 
 public interface IProfanityClient
 {

@@ -1,4 +1,5 @@
 using Comment.Services;
+using Feature.Flags;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Comment.Api.Controllers;
@@ -18,7 +19,8 @@ public class CommentController(ICommentService commentService) : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateCommentRequest request)
     {
         var dto = new CreateCommentDto(request.ArticleId, request.AuthorId, request.Content);
-        var comment = await commentService.CreateAsync(dto);
+        var flag = new ConfigProfanity(request.IsProfanityEnabled);
+        var comment = await commentService.CreateAsync(dto,flag);
         return CreatedAtAction(nameof(GetByArticle), new { articleId = comment.ArticleId }, comment);
     }
 
@@ -30,4 +32,4 @@ public class CommentController(ICommentService commentService) : ControllerBase
     }
 }
 
-public record CreateCommentRequest(Guid ArticleId, Guid AuthorId, string Content);
+public record CreateCommentRequest(Guid ArticleId, Guid AuthorId, string Content, bool IsProfanityEnabled);

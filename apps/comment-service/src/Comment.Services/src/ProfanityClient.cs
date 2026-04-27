@@ -1,7 +1,9 @@
 using System.Net.Http.Json;
+using models;
 using Polly;
 using Polly.CircuitBreaker;
 using Polly.Timeout;
+
 
 namespace Comment.Services;
 
